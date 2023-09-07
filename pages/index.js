@@ -1,7 +1,28 @@
 const FoodApp = () => {
+  const foodElements = [
+    "/food-svgs/apple.svg",
+    "/food-svgs/banana.svg",
+    "/food-svgs/carrot.svg",
+    // Add more SVGs here
+  ];
   return (
     <div>
       <h1 className="text-3xl font-bold underline">Food app</h1>
+      <div className="bg-gray-200 p-8">
+        <h1 className="text-3xl font-bold mb-4">My Refrigerator</h1>
+        <div className="grid grid-cols-3 gap-4">
+          {foodElements.map((src, index) => (
+            <div key={index} className="text-center">
+              <img
+                src={src}
+                alt={`Food ${index}`}
+                className="w-16 h-16 mx-auto mb-2"
+              />
+              <p>Food {index}</p>
+            </div>
+          ))}
+        </div>
+      </div>
       <ul class="space-y-4">
         <li class="flex items-center">
           <svg
