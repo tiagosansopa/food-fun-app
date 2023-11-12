@@ -1,3 +1,141 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.red-pattern {
+  background-color: #e5e5f7;
+  opacity: 0.8;
+  background-image: repeating-linear-gradient(
+      45deg,
+      #f74556 25%,
+      transparent 25%,
+      transparent 75%,
+      #f74556 75%,
+      #f74556
+    ),
+    repeating-linear-gradient(
+      45deg,
+      #f74556 25%,
+      #e5e5f7 25%,
+      #e5e5f7 75%,
+      #f74556 75%,
+      #f74556
+    );
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+.pink-pattern {
+  background-color: #e5e5f7;
+  opacity: 0.8;
+  background-image: repeating-linear-gradient(
+      45deg,
+      #d524a8 25%,
+      transparent 25%,
+      transparent 75%,
+      #d524a8 75%,
+      #d524a8
+    ),
+    repeating-linear-gradient(
+      45deg,
+      #d524a8 25%,
+      #e5e5f7 25%,
+      #e5e5f7 75%,
+      #d524a8 75%,
+      #d524a8
+    );
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+.black-pattern {
+  background-color: #e5e5f7;
+  opacity: 0.8;
+  background-image: repeating-linear-gradient(
+      45deg,
+      #000000 25%,
+      transparent 25%,
+      transparent 75%,
+      #000000 75%,
+      #000000
+    ),
+    repeating-linear-gradient(
+      45deg,
+      #000000 25%,
+      #e5e5f7 25%,
+      #e5e5f7 75%,
+      #000000 75%,
+      #000000
+    );
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+.yellow-pattern {
+  background-color: #e5e5f7;
+  opacity: 0.8;
+  background-image: repeating-linear-gradient(
+      45deg,
+      #c2a007 25%,
+      transparent 25%,
+      transparent 75%,
+      #c2a007 75%,
+      #c2a007
+    ),
+    repeating-linear-gradient(
+      45deg,
+      #c2a007 25%,
+      #e5e5f7 25%,
+      #e5e5f7 75%,
+      #c2a007 75%,
+      #c2a007
+    );
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+.green-pattern {
+  background-color: #e5e5f7;
+  opacity: 0.8;
+  background-image: repeating-linear-gradient(
+      45deg,
+      #69a000 25%,
+      transparent 25%,
+      transparent 75%,
+      #69a000 75%,
+      #69a000
+    ),
+    repeating-linear-gradient(
+      45deg,
+      #69a000 25%,
+      #e5e5f7 25%,
+      #e5e5f7 75%,
+      #69a000 75%,
+      #69a000
+    );
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+.brown-pattern {
+  background-color: #e5e5f7;
+  opacity: 0.8;
+  background-image: repeating-linear-gradient(
+      45deg,
+      #aa8a63 25%,
+      transparent 25%,
+      transparent 75%,
+      #aa8a63 75%,
+      #aa8a63
+    ),
+    repeating-linear-gradient(
+      45deg,
+      #aa8a63 25%,
+      #e5e5f7 25%,
+      #e5e5f7 75%,
+      #aa8a63 75%,
+      #aa8a63
+    );
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
