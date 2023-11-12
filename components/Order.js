@@ -1,4 +1,4 @@
-const Order = ({ value }) => {
+const Order = ({ value, selected, onClick }) => {
   const cards = [
     { value: "pineapple", img: "/ingredients/pineapple.png" },
     { value: "olive", img: "/ingredients/olive.png" },
@@ -10,7 +10,12 @@ const Order = ({ value }) => {
   ];
   return (
     <div
-      className={`w-24 h-36 flex flex-col bg-white rounded-lg shadow-md text-center m-1 ${value.color}-pattern hover:shadow-white hover:cursor-pointer`}
+      className={`w-24 h-36 flex flex-col bg-white rounded-lg shadow-md text-center m-1 ${
+        value.color
+      }-pattern hover:shadow-white hover:cursor-pointer ${
+        selected ? "my-[-20px] ring ring-green-500" : ""
+      }`}
+      onClick={onClick}
     >
       <div className="text-center bg-white m-1.5 flex flex-col flex-grow">
         {value.ingredients.map((ingredient) => {
@@ -21,7 +26,7 @@ const Order = ({ value }) => {
                 src={cards.find((card) => card.value === ingredient.type)?.img}
                 alt={value}
               />
-              x{ingredient.amount}
+              x {ingredient.amount}
             </div>
           );
         })}
