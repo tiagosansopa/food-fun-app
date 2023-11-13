@@ -27,21 +27,6 @@ const Room = () => {
   const [tableSelectedDeck, setTableSelectedDeck] = useState([]);
   const [tableOrder, setTableOrder] = useState(null);
 
-  const handleReset = () => {
-    setCompletedOrders(0);
-    setPlayerHand([]);
-    setPlayerOrderDeck(
-      shuffleArray(orderCards.filter((order) => order.value.color === "yellow"))
-    );
-    setIngredientsDeck(shuffleArray(ingredientCards));
-    setSelectedCards([]);
-    setOvenDeck([]);
-    setLastIngredient(null);
-    setTableDeck([]);
-    setTableSelectedDeck([]);
-    setTableOrder(null);
-  };
-
   const takeOrderCard = () => {
     if (playerOrderDeck.length > 0 && playerHand.length < 9) {
       const drawnCard = playerOrderDeck[0];
@@ -145,13 +130,14 @@ const Room = () => {
       <div className="flex bg-purple-100 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4  relative">
         <h1>Game Room: {roomId}</h1>
         <h2 className="mx-auto">Player 1</h2>
-        <button
+        {/* <button
           className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 ml-auto mr-1"
           onClick={handleReset}
         >
           Reset
-        </button>
+        </button> */}
       </div>
+
       <div className="flex">
         <div className="flex-1 p-4">
           <div className="flex flex-col">
@@ -166,6 +152,7 @@ const Room = () => {
             alt="Player Image"
             className="w-62 h-32 object-cover "
           />
+
           {lastIngredient &&
             (lastIngredient.type === "ingredient" ? (
               <img
@@ -180,6 +167,13 @@ const Room = () => {
                 className="absolute top-1/2 w-20 h-15"
               />
             ))}
+          {playerOrderDeck.length < 1 && (
+            <img
+              src="/elements/door.png"
+              alt="door"
+              className="w-62 h-32 object-cover absolute top-6"
+            />
+          )}
         </div>
         <div className="flex-1 p-4 flex justify-center">
           <div className="flex flex-col m-auto mr-4">
@@ -211,7 +205,68 @@ const Room = () => {
           </div>
         </div>
       </div>
-      <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4 mt-16 relative min-h-[176px]">
+      <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4  relative">
+        <div className="flex">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+            onClick={handleTakeOut}
+          >
+            Take Out
+          </button>
+        </div>
+        <div className="flex flex-col bg-blue-50 p-4 rounded-lg flex-wrap justify-center max-w-screen-sm mx-4 relative min-h-[176px]">
+          <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center min-w-screen-xl max-w-screen-xl mx-4 my-4 relative min-h-[176px]">
+            {tableDeck.map((card, index) => (
+              <div
+                className={`w-11 h-11 flex flex-col bg-white rounded-lg shadow-md text-center m-1 p-2 hover:cursor-pointer ${
+                  tableSelectedDeck.includes(card) ? " ring ring-green-500" : ""
+                }`}
+                onClick={() => handleTableCardClick(card)}
+              >
+                <img
+                  src={`/ingredients/${card.value}.png`}
+                  alt={`${card.value}`}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center">
+            <button
+              className="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
+              onClick={handleServeOrder}
+            >
+              Serve
+            </button>
+            <button
+              className="bg-green-700 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
+              onClick={() => {
+                setTableSelectedDeck([]);
+              }}
+            >
+              Clear
+            </button>
+            <button
+              className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
+              onClick={handleReturnOrder}
+            >
+              Return
+            </button>
+          </div>
+        </div>
+
+        <div className="flex p-4">
+          <div className="m-auto">
+            {tableOrder && (
+              <OrderCard
+                key={tableOrder.type}
+                type={tableOrder.type}
+                value={tableOrder.value}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4 relative min-h-[176px]">
         {playerHand.map((card, index) => {
           if (card.type === "order") {
             return (
@@ -235,83 +290,25 @@ const Room = () => {
             );
           }
         })}
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 absolute bottom-4 right-4"
-          onClick={handlePlayCards}
-        >
-          Put In
-        </button>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 absolute bottom-4 right-4"
-          onClick={handlePlayCards}
-        >
-          End Turn
-        </button>
-      </div>
-      Order Backlog
-      <div className="flex bg-pink-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4  relative">
-        {playerOrderDeck.map((card, index) => (
-          <OrderCard key={card.type} type={card.type} value={card.value} />
-        ))}
-      </div>
-      Oven
-      <div className="flex bg-red-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4  relative">
-        {ovenDeck.map((card, index) => (
-          <div className="w-7 h-7 flex flex-col bg-white rounded-lg shadow-md text-center m-1">
-            <img src={`/ingredients/${card.value}.png`} alt={`${card.value}`} />
-          </div>
-        ))}
-      </div>
-      <h1>Fin de ronda</h1>
-      <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4  relative">
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
-          onClick={handleTakeOut}
-        >
-          Take Out
-        </button>
-        <div className="flex flex-col bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4 mt-16 relative min-h-[176px]">
-          <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4 mt-16 relative min-h-[176px]">
-            {tableDeck.map((card, index) => (
-              <div
-                className={`w-11 h-11 flex flex-col bg-white rounded-lg shadow-md text-center m-1 p-2 hover:cursor-pointer ${
-                  tableSelectedDeck.includes(card) ? " ring ring-green-500" : ""
-                }`}
-                onClick={() => handleTableCardClick(card)}
-              >
-                <img
-                  src={`/ingredients/${card.value}.png`}
-                  alt={`${card.value}`}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-center">
-            <button
-              className="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
-              onClick={handleServeOrder}
-            >
-              Serve
-            </button>
-            <button
-              className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
-              onClick={handleReturnOrder}
-            >
-              Return
-            </button>
-          </div>
-        </div>
-
-        <div className="flex">
-          <div className="flex-1 p-4">
-            {tableOrder && (
-              <OrderCard
-                key={tableOrder.type}
-                type={tableOrder.type}
-                value={tableOrder.value}
-              />
-            )}
-          </div>
+        <div className="absolute bottom-4 right-4 flex justify-center">
+          <button
+            className="bg-orange-500 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 mx-1 "
+            onClick={handlePlayCards}
+          >
+            Put In
+          </button>
+          <button
+            className="bg-orange-600 hover:bg-orange-800 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 mx-1 "
+            onClick={handlePlayCards}
+          >
+            Complete
+          </button>
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 mx-1"
+            onClick={handlePlayCards}
+          >
+            End Turn
+          </button>
         </div>
       </div>
     </>
