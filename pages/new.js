@@ -1,30 +1,24 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/router";
-import { io } from "socket.io-client";
+import SocketContext from "../context/socketContext";
+import PlayerContext from "../context/playerContext";
+
 const New = () => {
   const router = useRouter();
-  const [playerName, setPlayerName] = useState("uim");
+  const [playerName, setPlayerName] = useState("");
   const [players, setPlayers] = useState(0);
-  const socket = io("http://localhost:3001");
+
+  const { socket } = useContext(SocketContext);
+  const { setUser } = useContext(PlayerContext);
 
   const handleStart = () => {
     if (playerName !== "" && players > 1) {
-      const roomId = "test01";
-      console.log("hoalss");
-      socket.emit("new-game", players, roomId);
-      //router.push(`/game/${roomId}`);
+      const roomId = playerName;
+      setUser(playerName);
+      socket.emit("new-game", { numPlayers: players, playerName, roomId });
+      router.push(`/game/${roomId}`);
     }
   };
-
-  socket.on("player-joined", (players) => {
-    console.log("Players:", players);
-  });
-
-  socket.on("start-game", (initialHand) => {
-    console.log("VAMOS A COMENZAR");
-    //setHand(initialHand);
-    //setGameStarted(true);
-  });
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/router";
 import Deck from "../../components/Deck";
 import IngredientCard from "../../components/Ingredient";
@@ -6,10 +6,16 @@ import OrderCard from "../../components/Order";
 import { shuffleArray } from "../../helpers";
 import { orderCards, ingredientCards } from "../../constants";
 
+import SocketContext from "../../context/socketContext";
+import PlayerContext from "../../context/playerContext";
+
 const Room = () => {
   const router = useRouter();
   const { roomId } = router.query;
-  const [playerName, setPlayerName] = useState("uim");
+  const { socket } = useContext(SocketContext);
+  const { user } = useContext(PlayerContext);
+
+  const [playersNames, setPlayersNames] = useState([]);
   const [completedOrders, setCompletedOrders] = useState(0);
   const [playerHand, setPlayerHand] = useState([]);
   const [playerColor, setPlayerColor] = useState("red");
@@ -26,6 +32,32 @@ const Room = () => {
   const [tableDeck, setTableDeck] = useState([]);
   const [tableSelectedDeck, setTableSelectedDeck] = useState([]);
   const [tableOrder, setTableOrder] = useState(null);
+
+  socket.on("player-joined", (data) => {
+    console.log("Players:", data.players);
+    setPlayersNames(data.players);
+  });
+
+  socket.on("start-game", (initialHand) => {
+    console.log("VAMOS A COMENZAR");
+    //setHand(initialHand);
+    //setGameStarted(true);
+  });
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      socket.emit("disconnecting");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+
+      // Clean up resources, if needed
+      socket.disconnect();
+    };
+  }, []);
 
   const takeOrderCard = () => {
     if (playerOrderDeck.length > 0 && playerHand.length < 9) {
@@ -86,6 +118,7 @@ const Room = () => {
     ]);
     setTableOrder(null);
   };
+
   const validateIngredients = (tableIngredients, orderIngredients) => {
     const ingredientCount = {};
     tableIngredients.forEach((ingredient) => {
@@ -129,20 +162,19 @@ const Room = () => {
     <>
       <div className="flex bg-purple-100 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4  relative">
         <h1>Game Room: {roomId}</h1>
-        <h2 className="mx-auto">Player 1</h2>
-        {/* <button
-          className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 ml-auto mr-1"
-          onClick={handleReset}
-        >
-          Reset
-        </button> */}
       </div>
 
       <div className="flex">
         <div className="flex-1 p-4">
           <div className="flex flex-col">
-            <span className="text-lg font-bold">{playerName}</span>
+            <span className="text-lg font-bold">{user}</span>
             <span>Orders Completed: {completedOrders}</span>
+            {playersNames.map((player) => (
+              <>
+                <span className="text-lg font-bold">{player}</span>
+                <span>Orders Completed: </span>
+              </>
+            ))}
           </div>
         </div>
 

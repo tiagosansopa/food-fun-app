@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useRouter } from "next/router";
+import SocketContext from "../context/socketContext";
+import PlayerContext from "../context/playerContext";
+
 const Join = () => {
   const router = useRouter();
-  const [playerName, setPlayerName] = useState("uim");
-  const [roomId, setRoomId] = useState("0");
+  const [playerName, setPlayerName] = useState("");
+  const [roomId, setRoomId] = useState("");
+
+  const { socket } = useContext(SocketContext);
+  const { setUser } = useContext(PlayerContext);
 
   const enterRoom = () => {
-    router.push(`/game/${roomId}`);
+    if (playerName !== "" && roomId !== "") {
+      setUser(playerName);
+      socket.emit("joined", { playerName, roomId });
+      router.push(`/game/${roomId}`);
+    }
   };
   return (
     <>
