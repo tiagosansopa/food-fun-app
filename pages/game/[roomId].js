@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Deck from "../../components/Deck";
 import IngredientCard from "../../components/Ingredient";
@@ -32,6 +32,7 @@ const Room = () => {
   const [tableDeck, setTableDeck] = useState([]);
   const [tableSelectedDeck, setTableSelectedDeck] = useState([]);
   const [tableOrder, setTableOrder] = useState(null);
+  const [roundOver, setRoundOver] = useState(false);
 
   socket.on("player-joined", (data) => {
     console.log("Players:", data.players);
@@ -46,7 +47,7 @@ const Room = () => {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      socket.emit("disconnecting");
+      socket.emit("disconnecting", { user });
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -55,7 +56,7 @@ const Room = () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
 
       // Clean up resources, if needed
-      socket.disconnect();
+      socket.disconnect({ user });
     };
   }, []);
 
@@ -237,67 +238,73 @@ const Room = () => {
           </div>
         </div>
       </div>
-      <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4  relative">
-        <div className="flex">
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
-            onClick={handleTakeOut}
-          >
-            Take Out
-          </button>
-        </div>
-        <div className="flex flex-col bg-blue-50 p-4 rounded-lg flex-wrap justify-center max-w-screen-sm mx-4 relative min-h-[176px]">
-          <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center min-w-screen-xl max-w-screen-xl mx-4 my-4 relative min-h-[176px]">
-            {tableDeck.map((card, index) => (
-              <div
-                className={`w-11 h-11 flex flex-col bg-white rounded-lg shadow-md text-center m-1 p-2 hover:cursor-pointer ${
-                  tableSelectedDeck.includes(card) ? " ring ring-green-500" : ""
-                }`}
-                onClick={() => handleTableCardClick(card)}
-              >
-                <img
-                  src={`/ingredients/${card.value}.png`}
-                  alt={`${card.value}`}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-center">
-            <button
-              className="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
-              onClick={handleServeOrder}
-            >
-              Serve
-            </button>
-            <button
-              className="bg-green-700 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
-              onClick={() => {
-                setTableSelectedDeck([]);
-              }}
-            >
-              Clear
-            </button>
-            <button
-              className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
-              onClick={handleReturnOrder}
-            >
-              Return
-            </button>
-          </div>
-        </div>
 
-        <div className="flex p-4">
-          <div className="m-auto">
-            {tableOrder && (
-              <OrderCard
-                key={tableOrder.type}
-                type={tableOrder.type}
-                value={tableOrder.value}
-              />
-            )}
+      {roundOver && (
+        <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4  relative">
+          <div className="flex">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+              onClick={handleTakeOut}
+            >
+              Take Out
+            </button>
+          </div>
+          <div className="flex flex-col bg-blue-50 p-4 rounded-lg flex-wrap justify-center max-w-screen-sm mx-4 relative min-h-[176px]">
+            <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center min-w-screen-xl max-w-screen-xl mx-4 my-4 relative min-h-[176px]">
+              {tableDeck.map((card, index) => (
+                <div
+                  className={`w-11 h-11 flex flex-col bg-white rounded-lg shadow-md text-center m-1 p-2 hover:cursor-pointer ${
+                    tableSelectedDeck.includes(card)
+                      ? " ring ring-green-500"
+                      : ""
+                  }`}
+                  onClick={() => handleTableCardClick(card)}
+                >
+                  <img
+                    src={`/ingredients/${card.value}.png`}
+                    alt={`${card.value}`}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-center">
+              <button
+                className="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
+                onClick={handleServeOrder}
+              >
+                Serve
+              </button>
+              <button
+                className="bg-green-700 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
+                onClick={() => {
+                  setTableSelectedDeck([]);
+                }}
+              >
+                Clear
+              </button>
+              <button
+                className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 m-auto"
+                onClick={handleReturnOrder}
+              >
+                Return
+              </button>
+            </div>
+          </div>
+
+          <div className="flex p-4">
+            <div className="m-auto">
+              {tableOrder && (
+                <OrderCard
+                  key={tableOrder.type}
+                  type={tableOrder.type}
+                  value={tableOrder.value}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
       <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4 relative min-h-[176px]">
         {playerHand.map((card, index) => {
           if (card.type === "order") {

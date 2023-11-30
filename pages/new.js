@@ -13,12 +13,15 @@ const New = () => {
 
   const handleStart = () => {
     if (playerName !== "" && players > 1) {
-      const roomId = playerName;
       setUser(playerName);
-      socket.emit("new-game", { numPlayers: players, playerName, roomId });
-      router.push(`/game/${roomId}`);
+      socket.emit("new-game", { numPlayers: players, playerName });
     }
   };
+
+  socket.on("player-joined", ({ players, roomId }) => {
+    console.log("Players:", players);
+    router.push(`/game/${roomId}`);
+  });
 
   return (
     <>

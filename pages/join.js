@@ -15,9 +15,13 @@ const Join = () => {
     if (playerName !== "" && roomId !== "") {
       setUser(playerName);
       socket.emit("joined", { playerName, roomId });
-      router.push(`/game/${roomId}`);
     }
   };
+  socket.on("player-joined", ({ players, roomId }) => {
+    console.log("Players:", players);
+    router.push(`/game/${roomId}`);
+  });
+
   return (
     <>
       <div className="flex flex-col bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4  relative">
