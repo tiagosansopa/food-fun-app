@@ -7,14 +7,16 @@ const New = () => {
   const router = useRouter();
   const [playerName, setPlayerName] = useState("");
   const [players, setPlayers] = useState(0);
+  const [playerColor, setColor] = useState("");
 
   const { socket } = useContext(SocketContext);
   const { setUser } = useContext(PlayerContext);
+  const colors = ["red", "yellow", "green", "pink", "brown", "black"];
 
   const handleStart = () => {
     if (playerName !== "" && players > 1) {
       setUser(playerName);
-      socket.emit("new-game", { numPlayers: players, playerName });
+      socket.emit("new-game", { numPlayers: players, playerName, playerColor });
     }
   };
 
@@ -33,6 +35,21 @@ const New = () => {
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
           ></input>
+        </div>
+        <div className="flex justify-center">
+          <label>Choose your color</label>
+          {colors.map((color) => {
+            return (
+              <button
+                className={`mx-auto my-4 bg-white p-1 rounded-lg w-24 h-24 ${color}-pattern  ${
+                  playerColor === color
+                    ? " ring-4 ring-offset-4 ring-blue-950"
+                    : ""
+                }`}
+                onClick={() => setColor(color)}
+              ></button>
+            );
+          })}
         </div>
         <span>Players</span>
         <div className="flex bg-blue-50 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4 relative">

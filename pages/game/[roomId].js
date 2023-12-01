@@ -35,11 +35,11 @@ const Room = () => {
   const [roundOver, setRoundOver] = useState(false);
 
   socket.on("player-joined", (data) => {
-    console.log("Players:", data.players);
+    console.log("Players? ", data.players);
     setPlayersNames(data.players);
   });
 
-  socket.on("start-game", (initialHand) => {
+  socket.on("start-game", (roomId) => {
     console.log("VAMOS A COMENZAR");
     //setHand(initialHand);
     //setGameStarted(true);
@@ -168,14 +168,15 @@ const Room = () => {
       <div className="flex">
         <div className="flex-1 p-4">
           <div className="flex flex-col">
-            <span className="text-lg font-bold">{user}</span>
-            <span>Orders Completed: {completedOrders}</span>
-            {playersNames.map((player) => (
-              <>
-                <span className="text-lg font-bold">{player}</span>
-                <span>Orders Completed: </span>
-              </>
-            ))}
+            {playersNames.map((player) => {
+              console.log(player);
+              return (
+                <>
+                  <span className="text-lg font-bold text-black">{player}</span>
+                  <span>Orders Completed: </span>
+                </>
+              );
+            })}
           </div>
         </div>
 
