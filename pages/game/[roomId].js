@@ -1,18 +1,17 @@
 import { useContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useSocket } from "../../context/socketContext";
+import PlayerContext from "../../context/playerContext";
 import Deck from "../../components/Deck";
 import IngredientCard from "../../components/Ingredient";
 import OrderCard from "../../components/Order";
 import { shuffleArray } from "../../helpers";
 import { orderCards, ingredientCards } from "../../constants";
 
-import SocketContext from "../../context/socketContext";
-import PlayerContext from "../../context/playerContext";
-
 const Room = () => {
   const router = useRouter();
   const { roomId } = router.query;
-  const { socket } = useContext(SocketContext);
+  const { socket } = useSocket();
   const { user } = useContext(PlayerContext);
 
   const [playersNames, setPlayersNames] = useState([]);
@@ -33,32 +32,32 @@ const Room = () => {
   const [tableSelectedDeck, setTableSelectedDeck] = useState([]);
   const [tableOrder, setTableOrder] = useState(null);
   const [roundOver, setRoundOver] = useState(false);
-
-  socket.on("player-joined", (data) => {
-    console.log("Players? ", data.players);
-    setPlayersNames(data.players);
-  });
-
-  socket.on("start-game", (roomId) => {
-    console.log("VAMOS A COMENZAR");
-    //setHand(initialHand);
-    //setGameStarted(true);
-  });
+  const [startButtonEnabled, setStartButtonEnabled] = useState(false);
 
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      socket.emit("disconnecting", { user });
+    const playerJoin = (data) => {
+      console.log("Players? ", data.players);
+      setPlayersNames((prevPlayersNames) => [
+        ...prevPlayersNames,
+        ...data.players,
+      ]);
     };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    const changeColor = (roomId) => {
+      console.log("EMPEZAR");
+      //setHand(initialHand);
+      setStartButtonEnabled(true);
+    };
+    socket.on("player-joined", playerJoin);
+    socket.on("start-game", changeColor);
+
+    socket.emit("player-ready", { socket: socket.id });
 
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-
-      // Clean up resources, if needed
-      socket.disconnect({ user });
+      socket.off("player-joined", playerJoin);
+      socket.off("start-game", changeColor);
     };
-  }, []);
+  }, [socket]);
 
   const takeOrderCard = () => {
     if (playerOrderDeck.length > 0 && playerHand.length < 9) {
@@ -163,18 +162,23 @@ const Room = () => {
     <>
       <div className="flex bg-purple-100 p-4 rounded-lg flex-wrap justify-center  max-w-screen-xl mx-4 my-4  relative">
         <h1>Game Room: {roomId}</h1>
+        {startButtonEnabled && (
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50">
+            START
+          </button>
+        )}
       </div>
 
       <div className="flex">
         <div className="flex-1 p-4">
           <div className="flex flex-col">
-            {playersNames.map((player) => {
-              console.log(player);
+            {playersNames.map((player, index) => {
               return (
-                <>
-                  <span className="text-lg font-bold text-black">{player}</span>
-                  <span>Orders Completed: </span>
-                </>
+                <div key={index}>
+                  <span className="text-lg font-bold text-black">
+                    {player.playerName}
+                  </span>
+                </div>
               );
             })}
           </div>

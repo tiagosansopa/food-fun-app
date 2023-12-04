@@ -1,17 +1,31 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import SocketContext from "../context/socketContext";
+import { useSocket } from "../context/socketContext";
 import PlayerContext from "../context/playerContext";
 
 const New = () => {
   const router = useRouter();
+  const { socket } = useSocket();
+  const { setUser } = useContext(PlayerContext);
   const [playerName, setPlayerName] = useState("");
   const [players, setPlayers] = useState(0);
   const [playerColor, setColor] = useState("");
 
-  const { socket } = useContext(SocketContext);
-  const { setUser } = useContext(PlayerContext);
   const colors = ["red", "yellow", "green", "pink", "brown", "black"];
+
+  useEffect(() => {
+    const playerJoin = ({ players, roomId }) => {
+      console.log("Players:", players);
+      socket.off("player-joined", playerJoin);
+      router.push(`/game/${roomId}`);
+    };
+
+    socket.on("player-joined", playerJoin);
+
+    return () => {
+      socket.off("player-joined", playerJoin);
+    };
+  }, [socket, router]);
 
   const handleStart = () => {
     if (playerName !== "" && players > 1) {
@@ -19,11 +33,6 @@ const New = () => {
       socket.emit("new-game", { numPlayers: players, playerName, playerColor });
     }
   };
-
-  socket.on("player-joined", ({ players, roomId }) => {
-    console.log("Players:", players);
-    router.push(`/game/${roomId}`);
-  });
 
   return (
     <>
