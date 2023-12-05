@@ -37,10 +37,7 @@ const Room = () => {
   useEffect(() => {
     const playerJoin = (data) => {
       console.log("Players? ", data.players);
-      setPlayersNames((prevPlayersNames) => [
-        ...prevPlayersNames,
-        ...data.players,
-      ]);
+      setPlayersNames(data.players);
     };
 
     const changeColor = (roomId) => {
@@ -51,7 +48,15 @@ const Room = () => {
     socket.on("player-joined", playerJoin);
     socket.on("start-game", changeColor);
 
-    socket.emit("player-ready", { socket: socket.id });
+    socket.emit("player-ready", { socket: socket.id }, (response) => {
+      if (response.success) {
+        console.log(`Player is ready in room ${response.roomId}`);
+        setPlayersNames(response.roomData.players);
+        if (response.ready) setStartButtonEnabled(true);
+      } else {
+        console.log(response.message);
+      }
+    });
 
     return () => {
       socket.off("player-joined", playerJoin);
